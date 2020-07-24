@@ -12,6 +12,7 @@ PrivateKey = SecretKey
 
 _public_key: Optional[PublicKey] = None
 _private_key: Optional[PrivateKey] = None
+_relin_key: Optional[RelinKeys] = None
 
 _mode = None
 _context = None
@@ -38,6 +39,12 @@ def set_private_key(key: PrivateKey) -> None:
     else:
         _decryptor = Decryptor(_context, key)
 
+def set_relin_key(key: RelinKeys) -> None:
+    if _mode['type'] != 'float':
+        raise ValueError('relin key should only be set for float mode!')
+    global _relin_key
+    _relin_key = key
+
 
 def load_public_key(filepath: str) -> None:
     key = PublicKey()
@@ -49,6 +56,11 @@ def load_private_key(filepath: str) -> None:
     key = PrivateKey()
     key.load(_context, filepath)
     set_private_key(key)
+
+def load_relin_key(filepath: str) -> None:
+    key = RelinKeys()
+    key.load(_context, filepath)
+    set_relin_key(key)
 
 
 def initialize(
@@ -78,10 +90,10 @@ def initialize(
     else:
         parms = EncryptionParameters(scheme_type.CKKS)
         poly_modulus_degree = 8192 
+        parms.set_poly_modulus_degree(poly_modulus_degree)
         parms.set_coeff_modulus(CoeffModulus.Create(
             poly_modulus_degree, [60, 40, 40, 60]
         ))
-        scale = pow(2.0, 40)
 
 
     # Initialize new context
@@ -94,18 +106,30 @@ def initialize(
 
     if mode == 'int':
         _mode['modulus'] = 2 * max_int
+    else:
+        _mode['encoder'] = CKKSEncoder(_context)
+        _mode['default_scale'] = pow(2.0, 40)
 
 
 def generate_keypair() -> Tuple[PublicKey, PrivateKey]:
-    """Returns a random keypair (public, private)."""
+    """
+    Returns a random keypair (public, private).
+    If float mode has been set, return three keys
+    (public, private, relin).
+    """
     keygen = KeyGenerator(_context)
-    return (keygen.public_key(), keygen.secret_key())
+    if _mode['type'] != 'float':
+        return (keygen.public_key(), keygen.secret_key())
+    else:
+        return (keygen.public_key(), keygen.secret_key(), keygen.relin_keys())
 
 
 def display_config() -> None:
     """Displays the current config to STDOUT."""
     print('===== simplefhe config =====' )
-    if _mode['type'] == 'int':
+    int_mode = (_mode['type'] == 'int')
+
+    if int_mode:
         modulus = _mode['modulus']
         print('mode: integer (exact)')
         print(f'min_int: {-modulus//2 + 1}')
@@ -113,8 +137,12 @@ def display_config() -> None:
     else:
         print('mode: float (approximate)')
 
-    print('public_key: {}'.format('missing' if _public_key is None else 'initialized'))
-    print('private_key: {}'.format('missing' if _private_key is None else 'initialized'))
+    is_initialized = lambda key: 'missing' if _public_key is None else 'initialized'
+
+    print(f'public_key: {is_initialized(_public_key)}')
+    print(f'private_key: {is_initialized(_private_key)}')
+    if not int_mode:
+        print(f'relin_keys: {is_initialized(_relin_key)}')
     print()
 
 

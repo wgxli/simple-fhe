@@ -12,7 +12,11 @@ class EncryptedValue:
         self._mode = simplefhe._mode
 
 
-    def _binop(self, other, cipher_func, plain_func = None):
+    def _binop(
+        self, other,
+        cipher_func, plain_func = None,
+        _is_mult: bool = False
+    ):
         """
         Returns the result of a binary operation between self and other.
         
@@ -31,18 +35,49 @@ class EncryptedValue:
         result = Ciphertext()
         if isinstance(other, EncryptedValue):
             other = other._ciphertext
-        
+
+
+        # Must normalize floats to same scale before adding/subtracting
+        float_mode = (simplefhe._mode['type'] == 'float')
+        evaluator = simplefhe._evaluator
+
+        # If adding, we need to match scale and modulus
+        if float_mode and not _is_mult:
+            target_scale = simplefhe._mode['default_scale']
+            self._ciphertext.scale(target_scale)
+            parms = self._ciphertext.parms_id()
+            def normalize(x):
+                simplefhe._evaluator.mod_switch_to_inplace(x, parms)
+
+        # After each multiplication, we should relinearize
+        def renormalize(x):
+            if float_mode and _is_mult:
+                evaluator.relinearize_inplace(x, simplefhe._relin_key)
+                evaluator.rescale_to_next_inplace(x)
+
+        # Determine type of other operand
         if not isinstance(other, Ciphertext):
-            if plain_func is not None:
+            from simplefhe.encryptors import encode_item
+            if False:#plain_func is not None:
                 # Use plain_func for performance
-                pt = Plaintext(str(other))
+                pt = encode_item(other)
+                if float_mode and not _is_mult: normalize(pt)
                 plain_func(self._ciphertext, pt, result)
+                renormalize(result)
                 return EncryptedValue(result)
             else:
                 # Fallback to encrypting and using cipher_func
-                other = simplefhe.encrypt(other)
+                other = simplefhe.encrypt(other)._ciphertext
 
+        # If adding, we need to match scale and modulus
+        if float_mode and not _is_mult:
+            other.scale(target_scale)
+            normalize(other)
+
+        # Compute binary operation
         cipher_func(self._ciphertext, other, result)
+
+        renormalize(result)
         return EncryptedValue(result)
 
 
@@ -68,11 +103,11 @@ class EncryptedValue:
         return self._binop(
             other,
             simplefhe._evaluator.multiply,
-            simplefhe._evaluator.multiply_plain
+            simplefhe._evaluator.multiply_plain,
+            _is_mult = True
         )
 
     __radd__ = __add__
-    __rsub__ = __sub__
     __rmul__ = __mul__
 
 

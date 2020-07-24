@@ -1,6 +1,7 @@
-from simplefhe import encrypt, load_public_key, display_config
+from simplefhe import encrypt, load_public_key, load_relin_keys, display_config
 
 load_public_key('keys/public.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 

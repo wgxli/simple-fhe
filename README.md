@@ -26,49 +26,61 @@ In the simplest case, just a few lines of code are all you need to have working 
 Suppose we have some sensitive data we wish to process on a remote server.
 The usual approach is to send the data over a secure connection to be processed server-side.
 
-```python
+```py
+# examples/intro/insecure.py
+
 # The server
 def process(x):
-    return x*x - 3*x + 1
+    return x**3 - 3*x + 1
 
 
 # The client
 sensitive_data = [-30, -5, 17, 28]
 for entry in sensitive_data:
     print(entry, process(entry)) # Bad! We are leaking sensitive information.
+
 ```
 The result:
-```
--30 991
--5 41
-17 239
-28 701
+```txt
+// examples/intro/insecure.out
+
+-30 -26909
+-5 -109
+17 4863
+28 21869
+
 ```
 However, this requires trusting the server to keep your data confidential. One rogue admin or database hack is all it takes to expose your sensitive data to the public.
 
 ## The Solution
 A few lines of extra code is all it takes to implement Full Homomorphic Encryption (FHE):
-```python
+```py
+# examples/intro/secure.py
+
 from simplefhe import (
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key,
+    set_public_key, set_private_key, set_relin_keys,
     display_config
 )
 
 # In a real application, the keypair would be generated once,
 # and only the public key would be provided to the server.
 # A more realistic example is given later.
-public_key, private_key = generate_keypair()
+public_key, private_key, relin_keys = generate_keypair()
 set_private_key(private_key)
 set_public_key(public_key)
+set_relin_keys(relin_keys)
+# Don't worry about the relin keys for now.
+# They should be shared between the client
+# and the server, just like the public keys.
 
 display_config()
 
 
 # The server
 def process(x):
-    return x*x - 3*x + 1
+    return x**3 - 3*x + 1
 
 
 # The client
@@ -77,20 +89,25 @@ for entry in sensitive_data:
     encrypted = encrypt(entry) # Encrypt the data...
     result = process(encrypted) # Process the data encrypted on the server...
     print(entry, decrypt(result)) # Decrypt the result on the client.
+
 ```
 We obtain the same results, as expected:
-```
+```txt
+// examples/intro/secure.out
+
 ===== simplefhe config =====
 mode: integer (exact)
-min_int: -1048575
-max_int: 1048576
+min_int: -262143
+max_int: 262144
 public_key: initialized
 private_key: initialized
+relin_keys: initialized
 
--30 991
--5 41
-17 239
-28 701
+-30 -26909
+-5 -109
+17 4863
+28 21869
+
 ```
 In this example, we encrypt the data on the client, *send only the encrypted data to the server,* process the encrypted data server-side,
 and return the encrypted result to be client-side decrypted. This requires zero trust of the remote server.
@@ -101,23 +118,30 @@ Here we demonstrate a more realistic pipeline.
 
 ### Step 1: Keypair Generation
 We first generate a fixed pair of keys:
-```python
+```py
+# examples/realistic/1_keygen.py
+
 from simplefhe import generate_keypair
 
-public_key, private_key  = generate_keypair()
+public_key, private_key, relin_keys = generate_keypair()
 public_key.save('keys/public.key')
 private_key.save('keys/private.key')
+relin_keys.save('keys/relin.key')
 print('Keypair saved to keys/ directory')
+
 ```
 
 ### Step 2: Client-Side Encryption
 Next, we encrypt our sensitive data on the client.
 Here we save the encrypted results to disk,
 but in the real-world these files would be sent over a network to the server.
-```python
-from simplefhe import encrypt, load_public_key, display_config
+```py
+# examples/realistic/2_encrypt.py
+
+from simplefhe import encrypt, load_public_key, load_relin_keys, display_config
 
 load_public_key('keys/public.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 
@@ -132,34 +156,44 @@ for i, entry in enumerate(sensitive_data):
 
 # We may then safely send these files to the server
 # over a (possibly insecure) network connection
+
 ```
 Output:
-```
+```txt
+// examples/realistic/2_encrypt.out
+
 ===== simplefhe config =====
 mode: integer (exact)
-min_int: -1048575
-max_int: 1048576
+min_int: -262143
+max_int: 262144
 public_key: initialized
-private_key: missing
+private_key: initialized
+relin_keys: initialized
 
 [CLIENT] Input -30 encrypted to inputs/0.dat
 [CLIENT] Input -5 encrypted to inputs/1.dat
 [CLIENT] Input 17 encrypted to inputs/2.dat
 [CLIENT] Input 28 encrypted to inputs/3.dat
+
 ```
 
 ### Step 3: Server-Side Processing
 We process the encrypted data from the client.
 The server never has access to the private key,
 and can never decrypt the client's sensitive data.
-```python
-from simplefhe import load_public_key, display_config, load_encrypted_value
+```py
+# examples/realistic/3_process.py
 
+from simplefhe import load_public_key, load_relin_keys, display_config, load_encrypted_value
+
+
+# The private key never leaves the client.
 load_public_key('keys/public.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 # Process values on server.
-def f(x): return x*x - 3*x + 1
+def f(x): return x**3 - 3*x + 1
 
 for i in range(4):
     # Load encrypted value sent from client
@@ -173,34 +207,44 @@ for i in range(4):
     # Send encrypted result back to client
     result.save(f'outputs/{i}.dat')
     print(f'[SERVER] Processed entry {i}: inputs/{i}.dat -> outputs/{i}.dat')
+
+
 ```
 Output:
-```
+```txt
+// examples/realistic/3_process.out
+
 ===== simplefhe config =====
 mode: integer (exact)
-min_int: -1048575
-max_int: 1048576
+min_int: -262143
+max_int: 262144
 public_key: initialized
-private_key: missing
+private_key: initialized
+relin_keys: initialized
 
 [SERVER] Processed entry 0: inputs/0.dat -> outputs/0.dat
 [SERVER] Processed entry 1: inputs/1.dat -> outputs/1.dat
 [SERVER] Processed entry 2: inputs/2.dat -> outputs/2.dat
 [SERVER] Processed entry 3: inputs/3.dat -> outputs/3.dat
+
 ```
 
 ### Step 4: Client-Side Decryption
 Finally, the encrypted results are sent back to the client,
 where they are decrypted.
 The private key never needs to leave the client.
-```python
+```py
+# examples/realistic/4_decrypt.py
+
 from simplefhe import (
-    load_private_key, display_config,
+    load_private_key, load_relin_keys,
+    display_config,
     decrypt, load_encrypted_value
 )
 
 # Note: this is the only step at which the private key is used!
 load_private_key('keys/private.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 
@@ -211,20 +255,25 @@ for i, entry in enumerate(sensitive_data):
     encrypted = load_encrypted_value(f'outputs/{i}.dat')
     result = decrypt(encrypted)
     print(f'[CLIENT] Result for {entry}: {result}')
+
 ```
 As expected, we obtain the correct results:
-```
+```txt
+// examples/realistic/4_decrypt.out
+
 ===== simplefhe config =====
 mode: integer (exact)
-min_int: -1048575
-max_int: 1048576
+min_int: -262143
+max_int: 262144
 public_key: missing
-private_key: initialized
+private_key: missing
+relin_keys: missing
 
-[CLIENT] Result for -30: 991
-[CLIENT] Result for -5: 41
-[CLIENT] Result for 17: 239
-[CLIENT] Result for 28: 701
+[CLIENT] Result for -30: -26909
+[CLIENT] Result for -5: -109
+[CLIENT] Result for 17: 4863
+[CLIENT] Result for 28: 21869
+
 ```
 
 ## Installation
@@ -235,14 +284,14 @@ is just a `pip` install away:
 
 ## Notes
 - To enable floating point computations (results will be approximate):
-```python
+```py
 from simplefhe import initialize
 initialize('float')
 ```
 This must be done before any other `simplefhe` code (keygen, encryption/decryption, etc.) is executed.
 A full example is shown later.
 - To increase the maximum range of allowable integers:
-```python
+```py
 from simplefhe import initialize
 
 MAX_INT = pow(2, 25)
@@ -257,11 +306,13 @@ This prevents a simple plaintext enumeration attack.
 
 ## Floating Point
 The following code shows a full floating point demo:
-```python
+```py
+# examples/float_demo.py
+
 from simplefhe import (
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key, set_relin_key,
+    set_public_key, set_private_key, set_relin_keys,
     initialize, display_config
 )
 
@@ -270,18 +321,18 @@ initialize('float')
 public_key, private_key, relin_key = generate_keypair()
 set_private_key(private_key)
 set_public_key(public_key)
-set_relin_key(relin_key)
+set_relin_keys(relin_key)
 
 display_config()
 
 
 # The server
 def process(x):
-    return x*x - 3.1*x + 5.3
+    return x**3 - 3.1*x + 5.3
 
 
 # The client
-sensitive_data = [-3.2, 0.1, 5.3, 12345.6]
+sensitive_data = [-3.2, 0.1, 5.3, 50.6]
 for entry in sensitive_data:
     insecure_result = process(entry)
     secure_result = decrypt(process(encrypt(entry)))
@@ -291,17 +342,21 @@ for entry in sensitive_data:
         f'{insecure_result:12.2f}',
         f'{secure_result:12.2f}'
     )
+
 ```
 The results are approximate, and will change slightly on each run:
-```
+```txt
+// examples/float_demo.out
+
 ===== simplefhe config =====
 mode: float (approximate)
 public_key: initialized
 private_key: initialized
 relin_keys: initialized
 
-    -3.2 |        25.46        25.46
-     0.1 |         5.00         5.00
-     5.3 |        16.96        16.96
- 12345.6 | 152375573.30 152375593.74
+    -3.2 |       -17.55       -17.55
+     0.1 |         4.99         4.99
+     5.3 |       137.75       137.75
+    50.6 |    129402.66    129402.76
+
 ```

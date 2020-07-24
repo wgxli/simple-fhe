@@ -5,7 +5,7 @@ from simplefhe import (
     initialize,
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key, set_relin_key
+    set_public_key, set_private_key, set_relin_keys
 )
 from simplefhe.datatypes import EncryptedValue
 
@@ -14,9 +14,10 @@ from simplefhe.datatypes import EncryptedValue
 class test_init(unittest.TestCase):
     def setUp(self):
         initialize('int')
-        pub, priv = generate_keypair()
+        pub, priv, relin = generate_keypair()
         set_public_key(pub)
         set_private_key(priv)
+        set_relin_keys(relin)
 
     def test_plaintext_init(self):
         N = 109023

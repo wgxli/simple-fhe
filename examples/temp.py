@@ -1,33 +1,32 @@
 from simplefhe import (
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key, set_relin_key,
+    set_public_key, set_private_key, set_relin_keys,
     initialize, display_config
 )
 
-initialize('float')
+initialize('int')
 
 public_key, private_key, relin_key = generate_keypair()
 set_private_key(private_key)
 set_public_key(public_key)
-set_relin_key(relin_key)
+set_relin_keys(relin_key)
 
 display_config()
 
 
 # The server
 def process(x):
-    return x*x - 3.1*x + 5.3
+    return x**21
 
 
 # The client
-sensitive_data = [-3.2, 0.1, 5.3, 12345.6]
+sensitive_data = [-3, 1, 3, 10]
 for entry in sensitive_data:
     insecure_result = process(entry)
     secure_result = decrypt(process(encrypt(entry)))
     print(
-        f'{entry:8.1f}',
-        '|',
-        f'{insecure_result:12.2f}',
-        f'{secure_result:12.2f}'
+        entry,
+        insecure_result,
+        secure_result
     )

@@ -11,8 +11,8 @@ def encrypt(item) -> EncryptedValue:
     if encryptor is None:
         raise ValueError('Public key has not been set. Encryption not possible.')
 
-    if simplefhe._mode['type'] == 'float' and simplefhe._relin_key is None:
-        raise ValueError('Relinearization key has not been set. Encryption not possible.')
+    if simplefhe._relin_keys is None:
+        raise ValueError('Relinearization keys have not been set. Encryption not possible.')
 
     # Generate plaintext
     pt = encode_item(item)

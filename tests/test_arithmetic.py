@@ -6,21 +6,22 @@ from simplefhe import (
     initialize,
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key, set_relin_key
+    set_public_key, set_private_key, set_relin_keys
 )
 
-ITERATIONS = 50
+ITERATIONS = 25
 
 
 class test_int(unittest.TestCase):
     def setUp(self):
         initialize('int')
-        pub, priv = generate_keypair()
+        pub, priv, relin = generate_keypair()
         set_public_key(pub)
         set_private_key(priv)
+        set_relin_keys(relin)
 
     def randint(self):
-        return random.randint(-1000, 1000)
+        return random.randint(-500, 500)
 
     def binop_test(self, binop):
         for i in range(ITERATIONS):
@@ -31,6 +32,16 @@ class test_int(unittest.TestCase):
     def test_addition(self): self.binop_test(op.add)
     def test_subtraction(self): self.binop_test(op.sub)
     def test_multiplication(self): self.binop_test(op.mul)
+
+    def test_pow(self):
+        for i in range(ITERATIONS):
+            a = random.randint(-7, 7)
+            b = random.randint(0, 6)
+            self.assertEqual(decrypt(encrypt(a)**b), a**b)
+
+    def test_pow_error(self):
+        a = lambda: encrypt(3)**-1
+        self.assertRaises(TypeError, a)
 
     def test_running_sum(self):
         true = 0
@@ -48,7 +59,7 @@ class test_float(unittest.TestCase):
         pub, priv, relin = generate_keypair()
         set_public_key(pub)
         set_private_key(priv)
-        set_relin_key(relin)
+        set_relin_keys(relin)
 
     def rand(self):
         return random.gauss(0, 1000)
@@ -66,6 +77,20 @@ class test_float(unittest.TestCase):
     def test_subtraction(self): self.binop_test(op.sub)
     def test_multiplication(self): self.binop_test(op.mul)
 
+    def test_div(self):
+        for i in range(ITERATIONS):
+            a = self.rand()
+            b = (2 * random.randint(0, 1) - 1) * random.uniform(1, 100)
+            self.assertAlmostEqual(
+                decrypt(encrypt(a)/b), a/b,
+                places=3
+            )
+
+    def test_pow(self):
+        for i in range(ITERATIONS):
+            a = self.rand() / 500
+            b = random.randint(0, 4)
+            self.assertAlmostEqual(decrypt(encrypt(a)**b), a**b, places=3)
 
     def test_running_sum(self):
         true = 0

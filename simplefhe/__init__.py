@@ -12,7 +12,7 @@ PrivateKey = SecretKey
 
 _public_key: Optional[PublicKey] = None
 _private_key: Optional[PrivateKey] = None
-_relin_key: Optional[RelinKeys] = None
+_relin_keys: Optional[RelinKeys] = None
 
 _mode = None
 _context = None
@@ -41,12 +41,10 @@ def set_private_key(key: PrivateKey) -> None:
     else:
         _decryptor = Decryptor(_context, key)
 
-def set_relin_key(key: RelinKeys) -> None:
+def set_relin_keys(key: RelinKeys) -> None:
     assert key is None or isinstance(key, RelinKeys)
-    if _mode['type'] != 'float':
-        raise ValueError('relin key should only be set for float mode!')
-    global _relin_key
-    _relin_key = key
+    global _relin_keys
+    _relin_keys = key
 
 
 def load_public_key(filepath: str) -> None:
@@ -60,15 +58,16 @@ def load_private_key(filepath: str) -> None:
     key.load(_context, filepath)
     set_private_key(key)
 
-def load_relin_key(filepath: str) -> None:
+def load_relin_keys(filepath: str) -> None:
     key = RelinKeys()
     key.load(_context, filepath)
-    set_relin_key(key)
+    set_relin_keys(key)
 
 
 def initialize(
     mode: str = 'float',
-    max_int: int = 1048576
+    max_int: int = 262144,
+    poly_modulus_degree: int = 8192,
 ) -> None:
     """
     Re-initializes the FHE encryption context.
@@ -80,19 +79,21 @@ def initialize(
     :param max_int:
         Only integers in the range [-max_int + 1, max_int] inclusive
         are representable. If `mode != 'int'`, this option is ignored.
+
+    :param poly_modulus_degree:
+        Should be a power of 2. Higher values will allow more computation
+        before the noise budget is exhausted, at the cost of performance.
     """
     if mode not in ['int', 'float']:
         raise ValueError("mode must be 'int' or 'float'")
 
     if mode == 'int':
         parms = EncryptionParameters(scheme_type.BFV)
-        poly_modulus_degree = 4096
         parms.set_poly_modulus_degree(poly_modulus_degree)
         parms.set_coeff_modulus(CoeffModulus.BFVDefault(poly_modulus_degree))
         parms.set_plain_modulus(2 * max_int)
     else:
         parms = EncryptionParameters(scheme_type.CKKS)
-        poly_modulus_degree = 8192 
         parms.set_poly_modulus_degree(poly_modulus_degree)
         parms.set_coeff_modulus(CoeffModulus.Create(
             poly_modulus_degree, [60, 40, 40, 60]
@@ -106,26 +107,21 @@ def initialize(
     _mode = {'type': mode}
     set_public_key(None)
     set_private_key(None)
+    set_relin_keys(None)
 
     if mode == 'int':
         _mode['modulus'] = 2 * max_int
     else:
-        set_relin_key(None)
         _mode['encoder'] = CKKSEncoder(_context)
         _mode['default_scale'] = pow(2.0, 40)
 
 
-def generate_keypair() -> Tuple[PublicKey, PrivateKey]:
+def generate_keypair() -> Tuple[PublicKey, PrivateKey, RelinKeys]:
     """
-    Returns a random keypair (public, private).
-    If float mode has been set, return three keys
-    (public, private, relin).
+    Returns a random keyset (public, private, relin).
     """
     keygen = KeyGenerator(_context)
-    if _mode['type'] != 'float':
-        return (keygen.public_key(), keygen.secret_key())
-    else:
-        return (keygen.public_key(), keygen.secret_key(), keygen.relin_keys())
+    return (keygen.public_key(), keygen.secret_key(), keygen.relin_keys())
 
 
 def display_config() -> None:
@@ -145,8 +141,7 @@ def display_config() -> None:
 
     print(f'public_key: {is_initialized(_public_key)}')
     print(f'private_key: {is_initialized(_private_key)}')
-    if not int_mode:
-        print(f'relin_keys: {is_initialized(_relin_key)}')
+    print(f'relin_keys: {is_initialized(_relin_keys)}')
     print()
 
 

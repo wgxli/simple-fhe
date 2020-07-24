@@ -1,0 +1,12 @@
+===== simplefhe config =====
+mode: integer (exact)
+min_int: -262143
+max_int: 262144
+public_key: initialized
+private_key: initialized
+relin_keys: initialized
+
+-30 -26909
+-5 -109
+17 4863
+28 21869

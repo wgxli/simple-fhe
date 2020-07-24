@@ -1,0 +1,12 @@
+===== simplefhe config =====
+mode: integer (exact)
+min_int: -262143
+max_int: 262144
+public_key: missing
+private_key: missing
+relin_keys: missing
+
+[CLIENT] Result for -30: -26909
+[CLIENT] Result for -5: -109
+[CLIENT] Result for 17: 4863
+[CLIENT] Result for 28: 21869

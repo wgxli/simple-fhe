@@ -1,10 +1,12 @@
 from simplefhe import (
-    load_private_key, display_config,
+    load_private_key, load_relin_keys,
+    display_config,
     decrypt, load_encrypted_value
 )
 
 # Note: this is the only step at which the private key is used!
 load_private_key('keys/private.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 

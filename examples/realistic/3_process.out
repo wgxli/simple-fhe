@@ -1,0 +1,12 @@
+===== simplefhe config =====
+mode: integer (exact)
+min_int: -262143
+max_int: 262144
+public_key: initialized
+private_key: initialized
+relin_keys: initialized
+
+[SERVER] Processed entry 0: inputs/0.dat -> outputs/0.dat
+[SERVER] Processed entry 1: inputs/1.dat -> outputs/1.dat
+[SERVER] Processed entry 2: inputs/2.dat -> outputs/2.dat
+[SERVER] Processed entry 3: inputs/3.dat -> outputs/3.dat

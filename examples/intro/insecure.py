@@ -1,6 +1,6 @@
 # The server
 def process(x):
-    return x*x - 3*x + 1
+    return x**3 - 3*x + 1
 
 
 # The client

@@ -1,10 +1,13 @@
-from simplefhe import load_public_key, display_config, load_encrypted_value
+from simplefhe import load_public_key, load_relin_keys, display_config, load_encrypted_value
 
+
+# The private key never leaves the client.
 load_public_key('keys/public.key')
+load_relin_keys('keys/relin.key')
 display_config()
 
 # Process values on server.
-def f(x): return x*x - 3*x + 1
+def f(x): return x**3 - 3*x + 1
 
 for i in range(4):
     # Load encrypted value sent from client

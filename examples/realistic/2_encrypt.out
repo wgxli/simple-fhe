@@ -1,0 +1,12 @@
+===== simplefhe config =====
+mode: integer (exact)
+min_int: -262143
+max_int: 262144
+public_key: initialized
+private_key: initialized
+relin_keys: initialized
+
+[CLIENT] Input -30 encrypted to inputs/0.dat
+[CLIENT] Input -5 encrypted to inputs/1.dat
+[CLIENT] Input 17 encrypted to inputs/2.dat
+[CLIENT] Input 28 encrypted to inputs/3.dat

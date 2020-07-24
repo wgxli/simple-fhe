@@ -1,0 +1,10 @@
+===== simplefhe config =====
+mode: float (approximate)
+public_key: initialized
+private_key: initialized
+relin_keys: initialized
+
+    -3.2 |       -17.55       -17.55
+     0.1 |         4.99         4.99
+     5.3 |       137.75       137.75
+    50.6 |    129402.66    129402.76

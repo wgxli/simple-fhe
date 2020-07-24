@@ -1,22 +1,25 @@
 language: python
 dist: bionic
+services:
+    - docker
 python:
     - '3.6'
     - '3.7'
     - '3.8'
 before_install:
-    - git clone https://github.com/Huelse/SEAL-Python.git
-    - pwd
-    - cd SEAL-Python/SEAL/native/src
+  - docker pull wgxli/simplefhe-build
+  - docker run -it -d --name build wgxli/simplefhe-build bash
+  - docker exec -w /home build mkdir travis
+  - docker exec -w /home/travis build mkdir build
+  - docker exec -w /home/travis/build build mkdir wgxli
+  - docker exec -w /home/travis/build/wgxli build git clone https://github.com/wgxli/simple-fhe.git
 install:
-    - cmake .
-    - make
-    - cd ../../..
-    - pip install -r requirements.txt
-    - python3 setup.py install
-    - cd ..
-    - pip install coveralls coverage
+  - pip install coveralls coverage
+  - docker exec build pip3 install coverage
 script:
-    - coverage run --branch -m unittest discover tests
+  - docker exec -w /home/travis/build/wgxli/simple-fhe build coverage run --branch -m unittest discover tests
+  - docker cp build:/home/travis/build/wgxli/simple-fhe/. .
+  - ls -la
+  - coverage report
 after_success:
-    - coveralls
+  - coveralls

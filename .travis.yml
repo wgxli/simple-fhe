@@ -13,5 +13,6 @@ install:
   - docker exec build pip3 install coveralls coverage
 script:
   - docker exec -w /simple-fhe build coverage run --branch -m unittest discover tests
+  - docker cp build:/simple-fhe/.coverage .
 after_success:
-  - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" -w /simple-fhe build coveralls
+  - coveralls

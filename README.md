@@ -20,6 +20,7 @@ In the simplest case, just a few lines of code are all you need to have working 
   * [Installation](#installation)
   * [Notes](#notes)
   * [Floating Point](#floating-point)
+  * [Linear Regression](#linear-regression)
 
 
 ## The Problem
@@ -360,3 +361,6 @@ relin_keys: initialized
     50.6 |    129402.66    129402.76
 
 ```
+
+## Linear Regression
+See [here](https://github.com/wgxli/simple-fhe/examples/linear-regression/) for a working server-side linear regression example.

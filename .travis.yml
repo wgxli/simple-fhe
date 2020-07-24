@@ -1,20 +1,21 @@
 language: python
+dist: bionic
 python:
-  - '3.6'
-  - '3.7'
-  - '3.8'
+    - '3.6'
+    - '3.7'
+    - '3.8'
 before_install:
-  - sudo apt update
-  - sudo apt -y install g++ make cmake
-  - git clone https://github.com/Huelse/SEAL-Python.git
-  - cd SEAL-Python/SEAL/native/src
+    - git clone https://github.com/Huelse/SEAL-Python.git
+    - pwd
+    - cd SEAL-Python/SEAL/native/src
 install:
-  - cmake .
-  - make
-  - pip install -r requirements.txt
-  - python3 setup.py install
-  - pip install coveralls coverage
+    - cmake .
+    - make
+    - cd ../../..
+    - pip install -r requirements.txt
+    - python3 setup.py install
+    - pip install coveralls coverage
 script:
-  - coverage run --branch -m unittest discover tests
+    - coverage run --branch -m unittest discover tests
 after_success:
-  - coveralls
+    - coveralls

@@ -10,7 +10,8 @@ before_install:
   - docker run -it -d --name build wgxli/simplefhe-build bash
   - docker exec -w / build git clone https://github.com/wgxli/simple-fhe.git
 install:
-  - docker exec build pip3 install coveralls coverage
+  - pip install coveralls
+  - docker exec build pip3 install coverage
 script:
   - docker exec -w /simple-fhe build coverage run --branch -m unittest discover tests
   - docker cp build:/simple-fhe/.coverage .

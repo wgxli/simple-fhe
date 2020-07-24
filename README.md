@@ -27,7 +27,7 @@ The result:
 17 239
 28 701
 ```
-*However,* this requires trusting the server to keep your data confidential. One rogue admin or database hack is all it takes to expose your sensitive data to the public.
+However, this requires trusting the server to keep your data confidential. One rogue admin or database hack is all it takes to expose your sensitive data to the public.
 
 ## The Solution
 A few lines of extra code is all it takes to implement Full Homomorphic Encryption (FHE):
@@ -211,7 +211,7 @@ private_key: initialized
 ```
 
 ## Installation
-`simplefhe` depends on `SEAL-Python` () and all its prerequisites.
+`simplefhe` depends on [SEAL-Python](https://github.com/Huelse/SEAL-Python) and all its prerequisites.
 After installing `SEAL-Python`, the `simplefhe` library
 is just a `pip` install away:
 `pip3 install simplefhe`

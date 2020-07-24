@@ -6,8 +6,11 @@ __pycache__/datatypes.cpython-38.pyc
 __pycache__/decryptors.cpython-38.pyc
 __pycache__/encryptors.cpython-38.pyc
 __pycache__/keys.cpython-38.pyc
-examples/insecure.py
-examples/secure.py
+dist/simplefhe-1.0.0-py3-none-any.whl
+dist/simplefhe-1.0.0.tar.gz
+examples/float_support.py
+examples/intro/insecure.py
+examples/intro/secure.py
 examples/realistic/1_keygen.py
 examples/realistic/2_encrypt.py
 examples/realistic/3_process.py
@@ -31,3 +34,7 @@ simplefhe.egg-info/PKG-INFO
 simplefhe.egg-info/SOURCES.txt
 simplefhe.egg-info/dependency_links.txt
 simplefhe.egg-info/top_level.txt
+simplefhe/__pycache__/__init__.cpython-38.pyc
+simplefhe/__pycache__/datatypes.cpython-38.pyc
+simplefhe/__pycache__/decryptors.cpython-38.pyc
+simplefhe/__pycache__/encryptors.cpython-38.pyc

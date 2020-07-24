@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: simplefhe
-Version: 1.0.0
+Version: 1.0.1
 Summary: Dead-simple full homomorphic encryption (FHE) for Python
 Home-page: https://github.com/wgxli/simple-fhe
 Author: Samuel Li
@@ -225,12 +225,69 @@ Description: # A Simple Drop-In Solution for Full Homomorphic Encryption
         `pip3 install simplefhe`
         
         ## Notes
+        - To enable floating point computations (results will be approximate):
+        ```python
+        from simplefhe import initialize
+        initialize('float')
+        ```
+        This must be done before any other `simplefhe` code (keygen, encryption/decryption, etc.) is executed.
+        A full example is shown later.
         - Comparison operations (`<`, `=`, `>`) are not supported on encrypted data.
         If they were, it would be pretty easy to figure out what the plaintext is!
         As a side effect, it's not really possible to branch based on encrypted data.
         - There is some randomness in the encryption process: the same value, encrypted with the same key, will yield different ciphertexts.
         This prevents a simple plaintext enumeration attack.
-        - Float support is currently experimental.
+        
+        ## Floating Point
+        The following code shows a full floating point demo:
+        ```python
+        from simplefhe import (
+            encrypt, decrypt,
+            generate_keypair,
+            set_public_key, set_private_key, set_relin_key,
+            initialize, display_config
+        )
+        
+        initialize('float')
+        
+        public_key, private_key, relin_key = generate_keypair()
+        set_private_key(private_key)
+        set_public_key(public_key)
+        set_relin_key(relin_key)
+        
+        display_config()
+        
+        
+        # The server
+        def process(x):
+            return x*x - 3.1*x + 5.3
+        
+        
+        # The client
+        sensitive_data = [-3.2, 0.1, 5.3, 12345.6]
+        for entry in sensitive_data:
+            insecure_result = process(entry)
+            secure_result = decrypt(process(encrypt(entry)))
+            print(
+                f'{entry:8.1f}',
+                '|',
+                f'{insecure_result:12.2f}',
+                f'{secure_result:12.2f}'
+            )
+        ```
+        The results are approximate, and will change slightly on each run:
+        ```
+        ===== simplefhe config =====
+        mode: float (approximate)
+        public_key: initialized
+        private_key: initialized
+        relin_keys: initialized
+        
+            -3.2 |        25.46        25.46
+             0.1 |         5.00         5.00
+             5.3 |        16.96        16.96
+         12345.6 | 152375573.30 152375593.74
+        ```
         
 Platform: UNKNOWN
 Classifier: License :: OSI Approved :: MIT License

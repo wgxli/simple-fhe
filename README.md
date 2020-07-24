@@ -1,9 +1,23 @@
 # A Simple Drop-In Solution for Full Homomorphic Encryption
+![pypi version](https://img.shields.io/pypi/v/simplefhe)
 Full Homomorphic Encryption (FHE) allows untrusted (e.g. cloud) applications
 to operate directly on encrypted data, eliminating the need for server-side decryption or trust.
 
 `simplefhe` is a Python library for FHE that intends to be as easy-to-use as possible.
 In the simplest case, just a few lines of code are all you need to have working FHE!
+
+## Table of Contents
+  * [The Problem](#the-problem)
+  * [The Solution](#the-solution)
+  * [A More Realistic Example](#a-more-realistic-example)
+     * [Step 1: Keypair Generation](#step-1-keypair-generation)
+     * [Step 2: Client-Side Encryption](#step-2-client-side-encryption)
+     * [Step 3: Server-Side Processing](#step-3-server-side-processing)
+     * [Step 4: Client-Side Decryption](#step-4-client-side-decryption)
+  * [Installation](#installation)
+  * [Notes](#notes)
+  * [Floating Point](#floating-point)
+
 
 ## The Problem
 Suppose we have some sensitive data we wish to process on a remote server.
@@ -224,6 +238,14 @@ initialize('float')
 ```
 This must be done before any other `simplefhe` code (keygen, encryption/decryption, etc.) is executed.
 A full example is shown later.
+- To increase the maximum range of allowable integers:
+```python
+from simplefhe import initialize
+
+MAX_INT = pow(2, 25)
+initialize('int', max_int=MAX_INT)
+```
+Integers in the range `[-MAX_INT + 1, MAX_INT]` inclusive are representable.
 - Comparison operations (`<`, `=`, `>`) are not supported on encrypted data.
 If they were, it would be pretty easy to figure out what the plaintext is!
 As a side effect, it's not really possible to branch based on encrypted data.

@@ -1,12 +1,5 @@
 language: python
-dist: trusty
-addons:
-    apt:
-        sources:
-            - ubuntu-toolchain-r-test
-        packages:
-            - gcc-7
-            - g++-7
+dist: bionic
 python:
     - '3.6'
     - '3.7'
@@ -14,8 +7,6 @@ python:
 before_install:
     - git clone https://github.com/Huelse/SEAL-Python.git
     - cd SEAL-Python/SEAL/native/src
-    - export CC=gcc-7
-    - export CXX=g++-7
 install:
     - cmake .
     - make

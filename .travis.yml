@@ -6,11 +6,12 @@ python:
     - '3.8'
 before_install:
     - git clone https://github.com/Huelse/SEAL-Python.git
+    - pwd
     - cd SEAL-Python/SEAL/native/src
 install:
     - cmake .
     - make
-    - cd ~/SEAL-Python
+    - cd ../../..
     - pip install -r requirements.txt
     - python3 setup.py install
     - pip install coveralls coverage

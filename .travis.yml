@@ -8,8 +8,11 @@ python:
 before_install:
   - docker pull wgxli/simplefhe-build
   - docker run -it -d --name build wgxli/simplefhe-build bash
+  - docker exec build cd ..
+  - docker exec build git clone https://github.com/wgxli/simple-fhe.git
+  - docker exec build cd simple-fhe
 install:
-  - docker exec build pip install coveralls coverage
+  - docker exec build pip3 install coveralls coverage
 script:
   - docker exec build coverage run --branch -m unittest discover tests
 after_success:

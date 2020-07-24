@@ -363,4 +363,4 @@ relin_keys: initialized
 ```
 
 ## Linear Regression
-See [here](https://github.com/wgxli/simple-fhe/examples/linear-regression/) for a working server-side linear regression example.
+See [here](https://github.com/wgxli/simple-fhe/tree/master/examples/linear-regression) for a working server-side linear regression example.

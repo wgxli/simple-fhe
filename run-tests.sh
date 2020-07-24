@@ -1,2 +1,3 @@
 #!/bin/bash
-coverage run -m unittest discover tests
+coverage run --branch -m unittest discover tests
+coverage html

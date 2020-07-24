@@ -23,6 +23,7 @@ _evaluator = None
 
 
 def set_public_key(key: PublicKey) -> None:
+    assert key is None or isinstance(key, PublicKey)
     global _public_key, _encryptor
     _public_key = key
     if key is None:
@@ -32,6 +33,7 @@ def set_public_key(key: PublicKey) -> None:
 
 
 def set_private_key(key: PrivateKey) -> None:
+    assert key is None or isinstance(key, PrivateKey)
     global _private_key, _decryptor
     _private_key = key
     if key is None:
@@ -40,6 +42,7 @@ def set_private_key(key: PrivateKey) -> None:
         _decryptor = Decryptor(_context, key)
 
 def set_relin_key(key: RelinKeys) -> None:
+    assert key is None or isinstance(key, RelinKeys)
     if _mode['type'] != 'float':
         raise ValueError('relin key should only be set for float mode!')
     global _relin_key
@@ -107,6 +110,7 @@ def initialize(
     if mode == 'int':
         _mode['modulus'] = 2 * max_int
     else:
+        set_relin_key(None)
         _mode['encoder'] = CKKSEncoder(_context)
         _mode['default_scale'] = pow(2.0, 40)
 

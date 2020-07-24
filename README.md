@@ -1,5 +1,6 @@
 # A Simple Drop-In Solution for Full Homomorphic Encryption
 ![pypi version](https://img.shields.io/pypi/v/simplefhe)
+
 Full Homomorphic Encryption (FHE) allows untrusted (e.g. cloud) applications
 to operate directly on encrypted data, eliminating the need for server-side decryption or trust.
 

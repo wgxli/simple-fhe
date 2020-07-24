@@ -5,8 +5,12 @@ import simplefhe
 
 def decrypt(item):
     decryptor = simplefhe._decryptor
-    if decryptor is None:
+
+    if simplefhe._private_key is None:
         raise ValueError('Private key has not been set. Decryption not possible.')
+
+    if simplefhe._mode['type'] == 'float' and simplefhe._relin_key is None:
+        raise ValueError('Relinearization key has not been set. Decryption not possible.')
 
     result = Plaintext()
     decryptor.decrypt(item._ciphertext, result)

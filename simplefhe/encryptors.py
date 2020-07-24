@@ -7,8 +7,12 @@ from simplefhe.datatypes import EncryptedValue
 
 def encrypt(item) -> EncryptedValue:
     encryptor = simplefhe._encryptor
+
     if encryptor is None:
         raise ValueError('Public key has not been set. Encryption not possible.')
+
+    if simplefhe._mode['type'] == 'float' and simplefhe._relin_key is None:
+        raise ValueError('Relinearization key has not been set. Encryption not possible.')
 
     # Generate plaintext
     pt = encode_item(item)

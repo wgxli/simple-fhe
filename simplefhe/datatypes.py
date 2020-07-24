@@ -5,8 +5,9 @@ import simplefhe
 
 class EncryptedValue:
     def __init__(self, value):
+        if isinstance(value, EncryptedValue): value = value._ciphertext
         if not isinstance(value, Ciphertext):
-            value = simplefhe.encrypt(value)
+            value = simplefhe.encrypt(value)._ciphertext
 
         self._ciphertext = value
         self._mode = simplefhe._mode

@@ -1,5 +1,6 @@
 import unittest
 import random
+import operator as op
 
 from simplefhe import (
     initialize,
@@ -21,17 +22,15 @@ class test_int(unittest.TestCase):
     def randint(self):
         return random.randint(-1000, 1000)
 
-    def test_addition(self):
+    def binop_test(self, binop):
         for i in range(ITERATIONS):
             a = self.randint()
             b = self.randint()
-            self.assertEqual(decrypt(encrypt(a) + encrypt(b)), a + b)
+            self.assertEqual(decrypt(binop(encrypt(a), encrypt(b))), binop(a, b))
 
-    def test_multiplication(self):
-        for i in range(ITERATIONS):
-            a = self.randint()
-            b = self.randint()
-            self.assertEqual(decrypt(encrypt(a) * encrypt(b)), a * b)
+    def test_addition(self): self.binop_test(op.add)
+    def test_subtraction(self): self.binop_test(op.sub)
+    def test_multiplication(self): self.binop_test(op.mul)
 
     def test_running_sum(self):
         true = 0
@@ -54,17 +53,19 @@ class test_float(unittest.TestCase):
     def rand(self):
         return random.gauss(0, 1000)
 
-    def test_addition(self):
+    def binop_test(self, binop):
         for i in range(ITERATIONS):
             a = self.rand()
             b = self.rand()
-            self.assertAlmostEqual(decrypt(encrypt(a) + encrypt(b)), a + b)
+            self.assertAlmostEqual(
+                decrypt(binop(encrypt(a), encrypt(b))), binop(a, b),
+                places=3
+            )
 
-    def test_multiplication(self):
-        for i in range(ITERATIONS):
-            a = self.rand()
-            b = self.rand()
-            self.assertAlmostEqual(decrypt(encrypt(a) * encrypt(b)), a * b, places=3)
+    def test_addition(self): self.binop_test(op.add)
+    def test_subtraction(self): self.binop_test(op.sub)
+    def test_multiplication(self): self.binop_test(op.mul)
+
 
     def test_running_sum(self):
         true = 0

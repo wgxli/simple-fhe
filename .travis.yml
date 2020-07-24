@@ -6,14 +6,15 @@ python:
   - '3.7'
   - '3.8'
 before_install:
-  - docker pull wgxli/simplefhe-build
-  - docker run -it -d --name build wgxli/simplefhe-build bash
-  - docker exec -w / build git clone https://github.com/wgxli/simple-fhe.git
+  - git clone https://github.com/Huelse/SEAL-Python.git
+  - cd SEAL-Python/SEAL/native/src
 install:
-  - pip install coveralls
-  - docker exec build pip3 install coverage
+  - cmake .
+  - make
+  - pip install -r requirements.txt
+  - python3 setup.py install
+  - pip install coveralls coverage
 script:
-  - docker exec -w /simple-fhe build coverage run --branch -m unittest discover tests
-  - docker cp build:/simple-fhe/.coverage .
+  - coverage run --branch -m unittest discover tests
 after_success:
   - coveralls

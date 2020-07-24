@@ -9,7 +9,7 @@ The overhead of FHE only makes sense for large quantities of data, stored server
 encrypted datapoints to the server, which computes a regression on large quantities of data accumulated over time.
 
 ## Step 1: Keypair Generation
-We generate an store a set of keys to be used throughout the process.
+We generate and store a set of keys to be used throughout the process.
 ```py
 # 1_keygen.py
 

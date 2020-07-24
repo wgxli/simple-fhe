@@ -20,7 +20,7 @@ In the simplest case, just a few lines of code are all you need to have working 
   * [Installation](#installation)
   * [Notes](#notes)
   * [Floating Point](#floating-point)
-  * [Linear Regression](#linear-regression)
+  * [Linear Regression Example](#linear-regression-example)
 
 
 ## The Problem
@@ -72,9 +72,6 @@ public_key, private_key, relin_keys = generate_keypair()
 set_private_key(private_key)
 set_public_key(public_key)
 set_relin_keys(relin_keys)
-# Don't worry about the relin keys for now.
-# They should be shared between the client
-# and the server, just like the public keys.
 
 display_config()
 
@@ -88,7 +85,7 @@ def process(x):
 sensitive_data = [-30, -5, 17, 28]
 for entry in sensitive_data:
     encrypted = encrypt(entry) # Encrypt the data...
-    result = process(encrypted) # Process the data encrypted on the server...
+    result = process(encrypted) # Process the encrypted data on the server...
     print(entry, decrypt(result)) # Decrypt the result on the client.
 
 ```
@@ -362,5 +359,5 @@ relin_keys: initialized
 
 ```
 
-## Linear Regression
+## Linear Regression Example
 See [here](https://github.com/wgxli/simple-fhe/tree/master/examples/linear-regression) for a working server-side linear regression example.

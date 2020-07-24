@@ -9,10 +9,10 @@ python:
 before_install:
   - docker pull wgxli/simplefhe-build
   - docker run -it -d --name build wgxli/simplefhe-build bash
-  - docker exec -w /home mkdir travis
-  - docker exec -w /home/travis mkdir build
-  - docker exec -w /home/travis/build mkdir wgxli
-  - docker exec -w /home/travis/build/wgxli git clone https://github.com/wgxli/simple-fhe.git
+  - docker exec -w /home build mkdir travis
+  - docker exec -w /home/travis build mkdir build
+  - docker exec -w /home/travis/build build mkdir wgxli
+  - docker exec -w /home/travis/build/wgxli build git clone https://github.com/wgxli/simple-fhe.git
 install:
   - pip install coveralls coverage
   - docker exec build pip3 install coverage

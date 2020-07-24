@@ -14,4 +14,4 @@ install:
 script:
   - docker exec -w /simple-fhe build coverage run --branch -m unittest discover tests
 after_success:
-  - docker exec -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" -w /simple-fhe build coveralls
+  - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" -w /simple-fhe build coveralls

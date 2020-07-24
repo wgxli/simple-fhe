@@ -2,16 +2,14 @@ language: python
 services:
   - docker
 python:
-  - '3.4.8'
-  - '3.5.9'
   - '3.6'
   - '3.7'
   - '3.8'
 before_install:
   - docker pull wgxli/simplefhe-build
 install:
-  - pip install coveralls coverage
+  - docker exec pip install coveralls coverage
 script:
-  - coverage run --branch -m unittest discover tests
+  - docker exec coverage run --branch -m unittest discover tests
 after_success:
-  - coveralls
+  - docker exec coveralls

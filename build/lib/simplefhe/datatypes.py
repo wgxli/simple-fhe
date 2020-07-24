@@ -122,8 +122,13 @@ class EncryptedValue:
             _is_mult = True
         )
 
+    def __neg__(self):
+        return 0 - self
+
     __radd__ = __add__
     __rmul__ = __mul__
+    def __rsub__(self, other):
+        return EncryptedValue(other) - self
 
 
     def __truediv__(self, other):

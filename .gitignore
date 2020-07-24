@@ -3,5 +3,4 @@ __pycache__
 *.egg-info
 dist/*
 .coverage
-examples/linear-regression/inputs/*
-examples/linear-regression/outputs/*
+examples/**/*.dat

@@ -3,7 +3,10 @@ This is a quick demo of multivariate linear regression
 on encrypted client data.
 For our example, we fit a linear function from 3D inputs to 1D outputs,
 using 50 encrypted datapoints.
-Partial results are returned to the client, which needs to perform relatively few computations to obtain the final regression coefficients.
+Partial results are returned to the client, who needs to perform relatively few computations to obtain the final regression coefficients.
+
+The overhead of FHE only makes sense for large quantities of data, stored server-side; for example, the client may continuously stream
+encrypted datapoints to the server, which computes a regression on large quantities of data accumulated over time.
 
 ## Step 1: Keypair Generation
 We generate an store a set of keys to be used throughout the process.

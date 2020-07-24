@@ -1,20 +1,28 @@
 language: python
+dist: trusty
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - gcc-7
+            - g++-7
 python:
-  - '3.6'
-  - '3.7'
-  - '3.8'
+    - '3.6'
+    - '3.7'
+    - '3.8'
 before_install:
-  - sudo apt update
-  - sudo apt -y install g++ make cmake
-  - git clone https://github.com/Huelse/SEAL-Python.git
-  - cd SEAL-Python/SEAL/native/src
+    - git clone https://github.com/Huelse/SEAL-Python.git
+    - cd SEAL-Python/SEAL/native/src
+    - export CC=gcc-7
+    - export CXX=g++-7
 install:
-  - cmake .
-  - make
-  - pip install -r requirements.txt
-  - python3 setup.py install
-  - pip install coveralls coverage
+    - cmake .
+    - make
+    - pip install -r requirements.txt
+    - python3 setup.py install
+    - pip install coveralls coverage
 script:
-  - coverage run --branch -m unittest discover tests
+    - coverage run --branch -m unittest discover tests
 after_success:
-  - coveralls
+    - coveralls

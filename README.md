@@ -68,10 +68,13 @@ from simplefhe import (
 # In a real application, the keypair would be generated once,
 # and only the public key would be provided to the server.
 # A more realistic example is given later.
+display_config()
 public_key, private_key, relin_keys = generate_keypair()
-set_private_key(private_key)
 set_public_key(public_key)
 set_relin_keys(relin_keys)
+display_config()
+
+set_private_key(private_key)
 
 display_config()
 
@@ -136,6 +139,7 @@ but in the real-world these files would be sent over a network to the server.
 ```py
 # examples/realistic/2_encrypt.py
 
+from pathlib import Path
 from simplefhe import encrypt, load_public_key, load_relin_keys, display_config
 
 load_public_key('keys/public.key')
@@ -145,6 +149,7 @@ display_config()
 
 # Encrypt our data (client-side)
 sensitive_data = [-30, -5, 17, 28]
+Path('inputs').mkdir(exist_ok=True)
 
 for i, entry in enumerate(sensitive_data):
     encrypted = encrypt(entry)
@@ -279,6 +284,8 @@ relin_keys: missing
 After installing `SEAL-Python`, the `simplefhe` library
 is just a `pip` install away:
 `pip3 install simplefhe`
+
+If you get an `ImportError`, be sure to run `python3 setup.py install` after building SEAL-Python to register the `seal` package.
 
 ## Notes
 - To enable floating point computations (results will be approximate):

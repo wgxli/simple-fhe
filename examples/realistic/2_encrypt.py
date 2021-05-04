@@ -1,3 +1,4 @@
+from pathlib import Path
 from simplefhe import encrypt, load_public_key, load_relin_keys, display_config
 
 load_public_key('keys/public.key')
@@ -7,6 +8,7 @@ display_config()
 
 # Encrypt our data (client-side)
 sensitive_data = [-30, -5, 17, 28]
+Path('inputs').mkdir(exist_ok=True)
 
 for i, entry in enumerate(sensitive_data):
     encrypted = encrypt(entry)

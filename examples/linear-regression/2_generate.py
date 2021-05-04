@@ -1,4 +1,6 @@
 # Client-side script to generate data and save in in encrypted format.
+from pathlib import Path
+
 import numpy as np
 
 from simplefhe import initialize, encrypt, load_public_key, load_relin_keys
@@ -8,6 +10,7 @@ from simplefhe import initialize, encrypt, load_public_key, load_relin_keys
 initialize('float')
 load_public_key('keys/public.key')
 load_relin_keys('keys/relin.key')
+Path('inputs').mkdir(exist_ok=True)
 
 
 # We generate example datapoints according to a linear model:

@@ -1,10 +1,12 @@
 # Server-side script to perform linear regression on the given data.
+from pathlib import Path
 from simplefhe import initialize, load_public_key, load_relin_keys, load_encrypted_value
 
 ##### Initialization and keys ####
 initialize('float')
 load_public_key('keys/public.key')
 load_relin_keys('keys/relin.key')
+Path('outputs').mkdir(exist_ok=True)
 
 
 #### Online linear regression class ####

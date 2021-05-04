@@ -10,12 +10,14 @@ except ModuleNotFoundError:
 
 PrivateKey = SecretKey
 
+_keygen = None
 _public_key: Optional[PublicKey] = None
 _private_key: Optional[PrivateKey] = None
 _relin_keys: Optional[RelinKeys] = None
 
 _mode = None
 _context = None
+
 _encryptor = None
 _decryptor = None
 _evaluator = None
@@ -88,12 +90,12 @@ def initialize(
         raise ValueError("mode must be 'int' or 'float'")
 
     if mode == 'int':
-        parms = EncryptionParameters(scheme_type.BFV)
+        parms = EncryptionParameters(scheme_type.bfv)
         parms.set_poly_modulus_degree(poly_modulus_degree)
         parms.set_coeff_modulus(CoeffModulus.BFVDefault(poly_modulus_degree))
         parms.set_plain_modulus(2 * max_int)
     else:
-        parms = EncryptionParameters(scheme_type.CKKS)
+        parms = EncryptionParameters(scheme_type.ckks)
         parms.set_poly_modulus_degree(poly_modulus_degree)
         parms.set_coeff_modulus(CoeffModulus.Create(
             poly_modulus_degree, [60, 40, 40, 60]
@@ -102,7 +104,7 @@ def initialize(
 
     # Initialize new context
     global _context, _evaluator, _mode
-    _context = SEALContext.Create(parms)
+    _context = SEALContext(parms)
     _evaluator = Evaluator(_context)
     _mode = {'type': mode}
     set_public_key(None)
@@ -120,8 +122,16 @@ def generate_keypair() -> Tuple[PublicKey, PrivateKey, RelinKeys]:
     """
     Returns a random keyset (public, private, relin).
     """
-    keygen = KeyGenerator(_context)
-    return (keygen.public_key(), keygen.secret_key(), keygen.relin_keys())
+    global _keygen
+    _keygen = KeyGenerator(_context)
+    public_key = PublicKey()
+    relin_keys = RelinKeys()
+    secret_key = _keygen.secret_key()
+
+    _keygen.create_public_key(public_key)
+    _keygen.create_relin_keys(relin_keys)
+
+    return (public_key, secret_key, relin_keys)
 
 
 def display_config() -> None:
@@ -137,7 +147,7 @@ def display_config() -> None:
     else:
         print('mode: float (approximate)')
 
-    is_initialized = lambda key: 'missing' if _public_key is None else 'initialized'
+    is_initialized = lambda key: 'missing' if key is None else 'initialized'
 
     print(f'public_key: {is_initialized(_public_key)}')
     print(f'private_key: {is_initialized(_private_key)}')

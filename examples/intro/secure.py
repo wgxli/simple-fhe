@@ -8,10 +8,13 @@ from simplefhe import (
 # In a real application, the keypair would be generated once,
 # and only the public key would be provided to the server.
 # A more realistic example is given later.
+display_config()
 public_key, private_key, relin_keys = generate_keypair()
-set_private_key(private_key)
 set_public_key(public_key)
 set_relin_keys(relin_keys)
+display_config()
+
+set_private_key(private_key)
 
 display_config()
 

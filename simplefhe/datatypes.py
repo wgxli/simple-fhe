@@ -39,7 +39,6 @@ class EncryptedValue:
             If omitted, `other` will be encrypted and passed into
             `cipher_func`.
         """
-        result = Ciphertext()
         if isinstance(other, EncryptedValue):
             other = other._ciphertext
 
@@ -71,7 +70,7 @@ class EncryptedValue:
                 # Use plain_func for performance
                 pt = encode_item(other)
                 if self._is_float: normalize(pt)
-                plain_func(self._ciphertext, pt, result)
+                result = plain_func(self._ciphertext, pt)
                 renormalize(result)
                 return EncryptedValue(result)
             else:
@@ -90,7 +89,7 @@ class EncryptedValue:
 
 
         # Compute binary operation
-        cipher_func(self._ciphertext, other, result)
+        result = cipher_func(self._ciphertext, other)
 
         renormalize(result)
         return EncryptedValue(result)
@@ -140,9 +139,8 @@ class EncryptedValue:
             raise NotImplementedError('Only division by an unencrypted value is implemented!')
 
     def square(self):
-        output = Ciphertext()
         evaluator = simplefhe._evaluator
-        evaluator.square(self._ciphertext, output)
+        output = evaluator.square(self._ciphertext)
         evaluator.relinearize_inplace(output, simplefhe._relin_keys)
         if self._is_float:
             evaluator.rescale_to_next_inplace(output)

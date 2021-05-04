@@ -1,4 +1,5 @@
 language: python
+os: linux
 dist: bionic
 services:
     - docker
@@ -13,6 +14,7 @@ before_install:
   - git submodule init && git submodule update
   - git submodule update --remote
   - cd SEAL
+  - ls -la
   - cmake -S . -B build -DSEAL_USE_MSGSL=OFF -DSEAL_USE_ZLIB=OFF -DSEAL_USE_ZSTD=OFF
   - cmake --build build
   - cd ..

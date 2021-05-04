@@ -24,7 +24,7 @@ install:
   - git clone https://github.com/wgxli/simple-fhe.git
   - cd simple-fhe
 script:
-  - coverage run --branch -m unittest discover tests
+  - coverage run --omit */site-packages/* --branch -m unittest discover tests
   - ls -la
   - coverage report
 after_success:

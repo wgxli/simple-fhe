@@ -6,7 +6,8 @@ from simplefhe import (
     initialize,
     encrypt, decrypt,
     generate_keypair,
-    set_public_key, set_private_key, set_relin_keys
+    set_public_key, set_private_key, set_relin_keys,
+    display_config
 )
 
 ITERATIONS = 25

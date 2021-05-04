@@ -1,4 +1,4 @@
-from seal import Plaintext, Ciphertext, DoubleVector
+from seal import Plaintext, Ciphertext
 
 import simplefhe
 
@@ -28,6 +28,5 @@ def decrypt(item):
             result -= mode['modulus']
         return result
     else:
-        decoded = DoubleVector()
-        item._mode['encoder'].decode(result, decoded)
+        decoded = item._mode['encoder'].decode(result)
         return float(decoded[0])

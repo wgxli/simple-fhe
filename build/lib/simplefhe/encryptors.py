@@ -18,8 +18,7 @@ def encrypt(item) -> EncryptedValue:
     pt = encode_item(item)
 
     # Return encrypted result
-    output = Ciphertext()
-    encryptor.encrypt(pt, output)
+    output = encryptor.encrypt(pt)
     return EncryptedValue(output)
 
 
@@ -56,6 +55,5 @@ def encode_float(item: float) -> Plaintext:
     encoder = mode['encoder']
     scale = mode['default_scale']
     
-    output = Plaintext()
-    encoder.encode(item, scale, output)
+    output = encoder.encode(float(item), scale)
     return output

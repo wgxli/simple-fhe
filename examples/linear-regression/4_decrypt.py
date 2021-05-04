@@ -29,4 +29,4 @@ coefficients = np.linalg.inv(XtX) @ XtY
 GROUND_TRUTH = [3.2, -1.7, 0.8]
 for i, pair in enumerate(zip(GROUND_TRUTH, coefficients)):
     a, b = pair
-    print(f'Coefficient {i}: Expected {a:.4f}, Received {b:.4f}')
+    print(f'Coefficient {i}: Expected {a:.4f}, Computed {b:.4f}')

@@ -7,18 +7,24 @@ python:
     - '3.7'
     - '3.8'
 before_install:
-  - docker pull wgxli/simplefhe-build
-  - docker run -it -d --name build wgxli/simplefhe-build bash
-  - docker exec -w /home build mkdir travis
-  - docker exec -w /home/travis build mkdir build
-  - docker exec -w /home/travis/build build mkdir wgxli
-  - docker exec -w /home/travis/build/wgxli build git clone https://github.com/wgxli/simple-fhe.git
+  - git clone https://github.com/Huelse/SEAL-Python.git
+  - cd SEAL-Python
+  - pip3 install -r requirements.txt
+  - git submodule init && git submodule update
+  - git submodule update --remote
+  - cd SEAL
+  - cmake -S . -B build -DSEAL_USE_MSGSL=OFF -DSEAL_USE_ZLIB=OFF -DSEAL_USE_ZSTD=OFF
+  - cmake --build build
+  - cd ..
+  - python3 setup.py build_ext -i
+  - python3 setup.py install
+  - cd ..
 install:
-  - pip install coveralls coverage
-  - docker exec build pip3 install coverage
+  - pip3 install coveralls coverage
+  - git clone https://github.com/wgxli/simple-fhe.git
+  - cd simple-fhe
 script:
-  - docker exec -w /home/travis/build/wgxli/simple-fhe build coverage run --branch -m unittest discover tests
-  - docker cp build:/home/travis/build/wgxli/simple-fhe/. .
+  - coverage run --branch -m unittest discover tests
   - ls -la
   - coverage report
 after_success:

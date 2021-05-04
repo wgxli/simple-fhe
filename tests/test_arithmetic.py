@@ -20,6 +20,8 @@ class test_int(unittest.TestCase):
         set_private_key(priv)
         set_relin_keys(relin)
 
+        display_config()
+
     def randint(self):
         return random.randint(-500, 500)
 
@@ -60,6 +62,8 @@ class test_float(unittest.TestCase):
         set_public_key(pub)
         set_private_key(priv)
         set_relin_keys(relin)
+
+        display_config()
 
     def rand(self):
         return random.gauss(0, 1000)
